@@ -72,10 +72,17 @@ class IndexedFile:
     def isopen(self):
         return self._isopen
 
+    def __len__(self):
+        assert self.isopen()
+        return len(self.lengths)
+
     def _get_files(self):
         entry_file = os.path.join(self.directory, 'entries.data')
         length_file = os.path.join(self.directory, 'lengths.txt')
         return entry_file, length_file
+
+    def __getitem__(self, index):
+        return self.read(index)
 
     def read(self, index):
         assert 'r' in self.mode or '+' in self.mode
@@ -134,14 +141,21 @@ def indexed_file(*args, **kwargs):
 
 if __name__ == '__main__':
     with indexed_file('test', 'w+') as fd:
+        print(len(fd))
         print('aa', file=fd)
+        print(len(fd))
         fd.end_entry()
+        print(len(fd))
         print(repr(fd.read(0)))
         print('bbb', file=fd)
-        print(repr(fd.read(0)))
+        print(len(fd))
+        print(repr(fd[0]))
         fd.end_entry()
+        print(len(fd))
         print(repr(fd.read(1)))
         print('cccc', file=fd)
+        print(len(fd))
         fd.end_entry()
+        print(len(fd))
         print(repr(fd.read(2)))
         #print(repr(fd.read(3)))
