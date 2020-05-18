@@ -2,6 +2,8 @@ import os
 
 
 class IndexedFile:
+    # See https://stackoverflow.com/questions/16208206/confused-by-python-file-mode-w and
+    # https://docs.python.org/3.8/library/functions.html#open for the modes.
     MODES = 'rwxabt+'
 
     def __init__(self, directory, mode='r'):
