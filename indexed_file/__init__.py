@@ -1,4 +1,5 @@
 import os
+from array import array
 
 
 class IndexedFile:
@@ -15,7 +16,6 @@ class IndexedFile:
     def _reset(self):
         self.length_fd = None
         self.entry_fd = None
-        self.lengths = None
         self.offsets = None
         self._isopen = False
         self._current_written_entry = None
@@ -48,14 +48,12 @@ class IndexedFile:
         self.entry_fd = open(entry_filename, self.mode)
 
         # Open and read the filename for the lengths.
-        with open(length_filename, 'r') as fd:
-            self.lengths = [int(line) for line in fd]
-
-        self.offsets = []
+        self.offsets = array('Q', [0])
         offset = 0
-        for length in [0] + self.lengths:
-            offset += length
-            self.offsets.append(offset)
+        with open(length_filename, 'r') as fd:
+            for line in fd:
+                offset += int(line)
+                self.offsets.append(offset)
 
         self._isopen = True
         return self
@@ -74,7 +72,7 @@ class IndexedFile:
 
     def __len__(self):
         assert self.isopen()
-        return len(self.lengths)
+        return len(self.offsets) - 1
 
     def _get_files(self):
         entry_file = os.path.join(self.directory, 'entries.data')
@@ -86,10 +84,10 @@ class IndexedFile:
 
     def read(self, index):
         assert 'r' in self.mode or '+' in self.mode
-        if index >= len(self.lengths):
+        if index >= len(self):
             raise IndexError
         offset = self.offsets[index]
-        length = self.lengths[index]
+        length = self.offsets[index + 1] - offset
         return self._read_n_bytes(offset, length)
 
     def _read_n_bytes(self, offset, n):
@@ -128,8 +126,7 @@ class IndexedFile:
             self.entry_fd.write(self._current_written_entry)
             print(len(self._current_written_entry), file=self.length_fd)
 
-            # maintain lengths and offsets cache
-            self.lengths.append(len(self._current_written_entry))
+            # maintain offsets cache
             self.offsets.append(self.offsets[-1] + len(self._current_written_entry))
 
             self._current_written_entry = None
@@ -144,18 +141,28 @@ if __name__ == '__main__':
         print(len(fd))
         print('aa', file=fd)
         print(len(fd))
+        assert len(fd) == 0
         fd.end_entry()
         print(len(fd))
+        assert len(fd) == 1
         print(repr(fd.read(0)))
+        assert fd[0] == 'aa' + os.linesep
         print('bbb', file=fd)
         print(len(fd))
+        assert len(fd) == 1
         print(repr(fd[0]))
+        assert fd[0] == 'aa' + os.linesep
         fd.end_entry()
         print(len(fd))
+        assert len(fd) == 2
         print(repr(fd.read(1)))
+        assert fd[1] == 'bbb' + os.linesep
         print('cccc', file=fd)
         print(len(fd))
+        assert len(fd) == 2
         fd.end_entry()
         print(len(fd))
+        assert len(fd) == 3
         print(repr(fd.read(2)))
+        assert fd[2] == 'cccc' + os.linesep
         #print(repr(fd.read(3)))
