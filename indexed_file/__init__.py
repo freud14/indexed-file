@@ -132,8 +132,8 @@ class IndexedFile:
             self._current_written_entry = None
 
 
-def indexed_file(*args, **kwargs):
-    return IndexedFile(*args, **kwargs).open()
+def indexed_file(directory, mode='r'):
+    return IndexedFile(directory, mode=mode).open()
 
 
 if __name__ == '__main__':
