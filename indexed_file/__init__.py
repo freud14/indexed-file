@@ -82,6 +82,9 @@ class IndexedFile:
     def __getitem__(self, index):
         return self.read(index)
 
+    def read_entry(self, index):
+        return self.read(index)
+
     def read(self, index):
         assert 'r' in self.mode or '+' in self.mode
         if index >= len(self):
