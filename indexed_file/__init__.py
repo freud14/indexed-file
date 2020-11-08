@@ -118,6 +118,10 @@ class IndexedFile:
         self.write(data)
         self.end_entry()
 
+    def write_line_entry(self, data):
+        assert 'b' not in self.mode
+        self.write_entry(data + os.linesep)
+
     def end_entry(self):
         assert self._is_write_mode()
         if self._current_written_entry is not None:
@@ -168,4 +172,7 @@ if __name__ == '__main__':
         assert len(fd) == 3
         print(repr(fd.read(2)))
         assert fd[2] == 'cccc' + os.linesep
-        #print(repr(fd.read(3)))
+        fd.write_line_entry('ddd')
+        print(repr(fd.read(3)))
+        assert fd[3] == 'ddd' + os.linesep
+        #print(repr(fd.read(4))) # should raise an exception
