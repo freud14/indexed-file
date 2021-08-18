@@ -15,17 +15,17 @@ def test_read_write_consistency():
         print(len(fd))
         assert len(fd) == 1
         print(repr(fd.read(0)))
-        assert fd[0] == 'aa' + os.linesep
+        assert fd[0] == 'aa\n'
         print('bbb', file=fd)
         print(len(fd))
         assert len(fd) == 1
         print(repr(fd[0]))
-        assert fd[0] == 'aa' + os.linesep
+        assert fd[0] == 'aa\n'
         fd.end_entry()
         print(len(fd))
         assert len(fd) == 2
         print(repr(fd.read(1)))
-        assert fd[1] == 'bbb' + os.linesep
+        assert fd[1] == 'bbb\n'
         print('cccc', file=fd)
         print(len(fd))
         assert len(fd) == 2
@@ -33,8 +33,8 @@ def test_read_write_consistency():
         print(len(fd))
         assert len(fd) == 3
         print(repr(fd.read(2)))
-        assert fd[2] == 'cccc' + os.linesep
+        assert fd[2] == 'cccc\n'
         fd.write_line_entry('ddd')
         print(repr(fd.read(3)))
-        assert fd[3] == 'ddd' + os.linesep
+        assert fd[3] == 'ddd\n'
         #print(repr(fd.read(4))) # should raise an exception
