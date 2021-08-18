@@ -1,6 +1,8 @@
 import os
 from array import array
 
+from .version import __version__
+
 
 class IndexedFile:
     # See https://stackoverflow.com/questions/16208206/confused-by-python-file-mode-w and
@@ -23,7 +25,7 @@ class IndexedFile:
     def __enter__(self):
         return self.open()
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type_, value, traceback):
         self.close()
 
     def __del__(self):
@@ -141,38 +143,3 @@ class IndexedFile:
 
 def indexed_file(directory, mode='r'):
     return IndexedFile(directory, mode=mode).open()
-
-
-if __name__ == '__main__':
-    with indexed_file('test', 'w+') as fd:
-        print(len(fd))
-        print('aa', file=fd)
-        print(len(fd))
-        assert len(fd) == 0
-        fd.end_entry()
-        print(len(fd))
-        assert len(fd) == 1
-        print(repr(fd.read(0)))
-        assert fd[0] == 'aa' + os.linesep
-        print('bbb', file=fd)
-        print(len(fd))
-        assert len(fd) == 1
-        print(repr(fd[0]))
-        assert fd[0] == 'aa' + os.linesep
-        fd.end_entry()
-        print(len(fd))
-        assert len(fd) == 2
-        print(repr(fd.read(1)))
-        assert fd[1] == 'bbb' + os.linesep
-        print('cccc', file=fd)
-        print(len(fd))
-        assert len(fd) == 2
-        fd.end_entry()
-        print(len(fd))
-        assert len(fd) == 3
-        print(repr(fd.read(2)))
-        assert fd[2] == 'cccc' + os.linesep
-        fd.write_line_entry('ddd')
-        print(repr(fd.read(3)))
-        assert fd[3] == 'ddd' + os.linesep
-        #print(repr(fd.read(4))) # should raise an exception

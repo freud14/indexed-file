@@ -129,3 +129,6 @@ dmypy.json
 .pyre/
 
 .vscode
+
+# Ignore auto-generated Python version file
+indexed_file/version.py
