@@ -47,7 +47,10 @@ class IndexedFile:
         if self._is_write_mode():
             self.length_fd = open(length_filename, self.mode.replace('b', ''))
 
-        self.entry_fd = open(entry_filename, self.mode, newline='')
+        if self._is_binary_mode():
+            self.entry_fd = open(entry_filename, self.mode)
+        else:
+            self.entry_fd = open(entry_filename, self.mode, newline='')
 
         # Open and read the filename for the lengths.
         self.offsets = array('Q', [0])
@@ -107,6 +110,9 @@ class IndexedFile:
     def _is_write_mode(self):
         return 'w' in self.mode or 'a' in self.mode or '+' in self.mode
 
+    def _is_binary_mode(self):
+        return 'b' in self.mode
+
     def write(self, data):
         assert self._is_write_mode()
 
@@ -121,7 +127,7 @@ class IndexedFile:
         self.end_entry()
 
     def write_line_entry(self, data, newline='\n'):
-        assert 'b' not in self.mode
+        assert not self._is_binary_mode()
         self.write_entry(data + newline)
 
     def end_entry(self):
