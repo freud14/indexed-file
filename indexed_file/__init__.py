@@ -47,7 +47,7 @@ class IndexedFile:
         if self._is_write_mode():
             self.length_fd = open(length_filename, self.mode.replace('b', ''))
 
-        self.entry_fd = open(entry_filename, self.mode)
+        self.entry_fd = open(entry_filename, self.mode, newline='')
 
         # Open and read the filename for the lengths.
         self.offsets = array('Q', [0])
@@ -120,9 +120,9 @@ class IndexedFile:
         self.write(data)
         self.end_entry()
 
-    def write_line_entry(self, data):
+    def write_line_entry(self, data, newline='\n'):
         assert 'b' not in self.mode
-        self.write_entry(data + os.linesep)
+        self.write_entry(data + newline)
 
     def end_entry(self):
         assert self._is_write_mode()
