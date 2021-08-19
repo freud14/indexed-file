@@ -1,5 +1,6 @@
 import os
 from tempfile import TemporaryDirectory
+import pytest
 
 from indexed_file import indexed_file
 
@@ -37,4 +38,5 @@ def test_read_write_consistency():
         fd.write_line_entry('ddd')
         print(repr(fd.read(3)))
         assert fd[3] == 'ddd\n'
-        #print(repr(fd.read(4))) # should raise an exception
+        with pytest.raises(IndexError):
+            print(repr(fd.read(4))) # should raise an exception
