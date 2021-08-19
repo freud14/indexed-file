@@ -39,4 +39,4 @@ def test_read_write_consistency():
         print(repr(fd.read(3)))
         assert fd[3] == 'ddd\n'
         with pytest.raises(IndexError):
-            print(repr(fd.read(4))) # should raise an exception
+            print(repr(fd.read(4)))
